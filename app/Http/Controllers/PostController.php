@@ -9,6 +9,18 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
+    public function index()
+    {
+        // This will get all the user_id in profiles table using the many-to-many relationship
+        // Return [1, 2, 3] array of user_id
+        $following = auth()->user()->following()->pluck('profiles.user_id');
+        $posts = Post::whereIn('profile_id', $following)
+            ->with(['profile.user', 'image'])
+            ->latest()
+            ->get();
+        return response($posts, 200);
+    }
+
     public function show($id)
     {
         $post = Post::find($id);

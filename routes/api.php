@@ -33,8 +33,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     ]);
 
     Route::resource('posts', PostController::class)->only([
-        'show', 'store', 'destroy'
+        'index', 'show', 'store', 'destroy'
     ]);
 
     Route::post('/follow/{user}', [FollowsController::class, 'store']);
+
+    Route::get('/following', [FollowsController::class, 'following']);
+
 });

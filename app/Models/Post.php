@@ -21,4 +21,9 @@ class Post extends Model
     {
         return $this->morphOne(Image::class, 'imageable');
     }
+
+    public function profile()
+    {
+        return $this->belongsTo(Profile::class);
+    }
 }
