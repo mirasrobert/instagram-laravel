@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\MeController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\FollowsController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -34,4 +35,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::resource('posts', PostController::class)->only([
         'show', 'store', 'destroy'
     ]);
+
+    Route::post('/follow/{user}', FollowsController::class);
 });

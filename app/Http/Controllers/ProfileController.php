@@ -28,7 +28,13 @@ class ProfileController extends Controller
             ], 404);
         }
 
-        return response($profile, 200);
+        // Check if the authenticated user is following this profile
+        $follows = auth()->user()->following->contains($profile->id);
+
+        return response([
+            'profile' => $profile,
+            'follows' => $follows
+        ], 200);
 
     }
 
