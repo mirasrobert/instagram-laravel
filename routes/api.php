@@ -36,5 +36,5 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         'show', 'store', 'destroy'
     ]);
 
-    Route::post('/follow/{user}', FollowsController::class);
+    Route::post('/follow/{user}', [FollowsController::class, 'store']);
 });

@@ -16,13 +16,16 @@ class ProfileController extends Controller
 
     public function show($username)
     {
-        $profile = Profile::with(['user', 'posts.image'])
+        $profile = Profile::with(['user' => function ($query) {
+            $query->withCount('following');
+        }, 'posts.image',])
+            ->withCount('followers')
             ->whereHas('user', function ($query) use ($username) {
                 $query->where('username', $username);
             })
             ->first();
 
-        if(!$profile) {
+        if (!$profile) {
             return response([
                 'message' => 'Profile not found'
             ], 404);
@@ -42,7 +45,7 @@ class ProfileController extends Controller
     {
         $profile = Profile::with('user')->find($id);
 
-        if(!$profile) {
+        if (!$profile) {
             return response([
                 'message' => 'Profile not found'
             ], 404);
@@ -58,7 +61,7 @@ class ProfileController extends Controller
     {
         $profile = Profile::find($id);
 
-        if(!$profile) {
+        if (!$profile) {
             return response([
                 'message' => 'Profile not found'
             ], 404);
