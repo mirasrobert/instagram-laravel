@@ -21,6 +21,18 @@ class FollowsController extends Controller
         // Return [1, 2, 3] array of user_id
         $following = auth()->user()->following()->pluck('profiles.user_id');
         $users = User::whereIn('id', $following)->get();
-        return response($users, 200);
+
+        // Put ur id in collection to remove from suggestion follwing
+        $following->push(auth()->user()->id);
+
+        // Get 5 users that you are not following 
+        $suggestions = User::whereNotIn('id', $following)
+            ->take(4)
+            ->get();
+
+        return response([
+            'following' => $users,
+            'suggestions' => $suggestions
+        ], 200);
     }
 }

@@ -14,6 +14,7 @@ class PostController extends Controller
         // This will get all the user_id in profiles table using the many-to-many relationship
         // Return [1, 2, 3] array of user_id
         $following = auth()->user()->following()->pluck('profiles.user_id');
+        $following->push(auth()->user()->id);
         $posts = Post::whereIn('profile_id', $following)
             ->with(['profile.user', 'image'])
             ->latest()
