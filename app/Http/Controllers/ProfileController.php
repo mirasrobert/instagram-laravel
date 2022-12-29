@@ -14,14 +14,14 @@ class ProfileController extends Controller
         return response($profiles, 200);
     }
 
-    public function show($username)
+    public function show($id)
     {
         $profile = Profile::with(['user' => function ($query) {
             $query->withCount('following');
         }, 'posts.image',])
             ->withCount('followers')
-            ->whereHas('user', function ($query) use ($username) {
-                $query->where('username', $username);
+            ->whereHas('user', function ($query) use ($id) {
+                $query->where('username', $id);
             })
             ->first();
 
@@ -43,7 +43,16 @@ class ProfileController extends Controller
 
     public function update(Request $request, $id)
     {
-        $profile = Profile::with('user')->find($id);
+        $fields = $request->validate([
+            'name' => ['required', 'string'],
+            'email' => ['required', 'email'],
+            'username' => ['required', 'string'],
+            'image' => ''
+        ]);
+
+        $profile = Profile::whereHas('user', function ($query) use ($id) {
+            $query->where('username', $id);
+        })->first();
 
         if (!$profile) {
             return response([
@@ -51,9 +60,32 @@ class ProfileController extends Controller
             ], 404);
         }
 
-        return response([
-            'message' => 'Update coming soon...'
+        $profile->update([
+            'description' => $request->description,
+            'website' => $request->website,
         ]);
+
+        $updateUserFields = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'username' => $request->username,
+        ];
+
+        $uploadedFileUrl = 'https://t3.ftcdn.net/jpg/02/48/42/64/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg';
+
+        if ($request->hasFile('image')) {
+            // Upload an image file to cloudinary with one line of code
+            // $uploadedFileUrl = cloudinary()->upload($request->file('image')->getRealPath())->getSecurePath();
+            $uploadedFileUrl = $request->file('image')->store('uploads', 'public');
+            $uploadedFileUrl = '/storage/' . $uploadedFileUrl;
+            $updateUserFields = array_merge($updateUserFields, ['avatar' => $uploadedFileUrl]);
+        }
+
+        auth()->user()->update($updateUserFields);
+
+        return response([
+            'message' => 'Profile has been updated.'
+        ], 200);
 
     }
 
