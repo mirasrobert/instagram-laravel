@@ -16,9 +16,13 @@ class PostController extends Controller
         $following = auth()->user()->following()->pluck('profiles.user_id');
         $following->push(auth()->user()->id);
         $posts = Post::whereIn('profile_id', $following)
-            ->with(['profile.user', 'image'])
+            ->with(['profile.user', 'image', 'likes' => function($query) {
+                $query->wherePivot('user_id', auth()->user()->id);
+            }])
+            ->withCount('likes')
             ->latest()
             ->get();
+
         return response($posts, 200);
     }
 
@@ -80,5 +84,10 @@ class PostController extends Controller
         return response([
             'message' => 'Post deleted'
         ], 200);
+    }
+
+    public function like_post(Post $post)
+    {
+        return auth()->user()->post_like()->toggle($post);
     }
 }

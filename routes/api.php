@@ -36,6 +36,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         'create', 'store'
     ]);
 
+    Route::post('/posts/like_post/{post}', [PostController::class, 'like_post']);
+
     Route::resource('posts', PostController::class)->only([
         'index', 'show', 'store', 'destroy'
     ]);

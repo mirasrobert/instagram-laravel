@@ -26,4 +26,10 @@ class Post extends Model
     {
         return $this->belongsTo(Profile::class);
     }
+
+    // Post can like by many users
+    public function likes()
+    {
+        return $this->belongsToMany(User::class, 'likes');
+    }
 }
