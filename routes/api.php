@@ -30,6 +30,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::apiResource('profiles', ProfileController::class);
 
+    Route::get('/profiles/search/{search}', [ProfileController::class, 'search']);
+
     Route::resource('profiles', ProfileController::class)->except([
         'create', 'store'
     ]);

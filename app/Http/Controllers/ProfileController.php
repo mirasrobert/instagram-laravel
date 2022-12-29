@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Profile;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
@@ -105,6 +106,18 @@ class ProfileController extends Controller
             'message' => 'Profile deleted'
         ], 200);
 
+    }
+
+    public function search($search)
+    {
+        $profiles = Profile::whereHas('user', function ($query) use ($search) {
+            $query->where('username', 'like', '%' . $search . '%');
+        })
+            ->with('user:id,name,username,avatar')
+            ->take(5)
+            ->get(['id', 'user_id']);
+
+        return response($profiles, 200);
     }
 
 }
