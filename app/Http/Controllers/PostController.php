@@ -16,10 +16,11 @@ class PostController extends Controller
         $following = auth()->user()->following()->pluck('profiles.user_id');
         $following->push(auth()->user()->id);
         $posts = Post::whereIn('profile_id', $following)
-            ->with(['profile.user', 'image', 'likes' => function($query) {
-                $query->wherePivot('user_id', auth()->user()->id);
+            ->with(['profile.user', 'image', 'likes' => function ($query) {
+                $query->wherePivot('user_id', auth()->user()->id); // To check if user liked the post
             }])
             ->withCount('likes')
+            ->withCount('comments')
             ->latest()
             ->get();
 
@@ -28,9 +29,13 @@ class PostController extends Controller
 
     public function show($id)
     {
-        $post = Post::find($id);
+        $post = Post::with(['profile.user', 'image', 'comments.user', 'likes' => function ($query) {
+            $query->wherePivot('user_id', auth()->user()->id); // To check if user liked the post
+        }])
+            ->withCount('likes')
+            ->find($id);
 
-        if(!$post) {
+        if (!$post) {
             return response([
                 'message' => 'Post not found'
             ], 404);
@@ -57,7 +62,8 @@ class PostController extends Controller
             // Upload an image file to cloudinary with one line of code
             // $uploadedFileUrl = cloudinary()->upload($request->file('image')->getRealPath())->getSecurePath();
             $uploadedFileUrl = $request->file('image')->store('uploads', 'public');
-            $uploadedFileUrl = '/storage/' . $uploadedFileUrl;
+            $APP_URL = env('APP_URL', 'http://localhost:8000');
+            $uploadedFileUrl = $APP_URL . '/storage/' . $uploadedFileUrl;
         }
 
         Image::create([
@@ -73,7 +79,7 @@ class PostController extends Controller
     {
         $post = Post::find($id);
 
-        if(!$post) {
+        if (!$post) {
             return response([
                 'message' => 'Post not found'
             ], 404);

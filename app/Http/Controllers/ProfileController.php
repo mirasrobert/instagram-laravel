@@ -78,7 +78,8 @@ class ProfileController extends Controller
             // Upload an image file to cloudinary with one line of code
             // $uploadedFileUrl = cloudinary()->upload($request->file('image')->getRealPath())->getSecurePath();
             $uploadedFileUrl = $request->file('image')->store('uploads', 'public');
-            $uploadedFileUrl = '/storage/' . $uploadedFileUrl;
+            $APP_URL = env('APP_URL', 'http://localhost:8000');
+            $uploadedFileUrl = $APP_URL . '/storage/' . $uploadedFileUrl;
             $updateUserFields = array_merge($updateUserFields, ['avatar' => $uploadedFileUrl]);
         }
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\MeController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FollowsController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
@@ -45,5 +46,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/follow/{user}', [FollowsController::class, 'store']);
 
     Route::get('/following', [FollowsController::class, 'following']);
+
+    Route::post('/comments/{post}', [CommentController::class, 'store']);
+    Route::delete('/comments/{post}', [CommentController::class, 'delete']);
 
 });
